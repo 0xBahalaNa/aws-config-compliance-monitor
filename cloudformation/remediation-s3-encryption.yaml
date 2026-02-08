@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This template creates an AWS Config rule that checks if S3 buckets have server-side encryption enabled.
+  It also includes a remediation action that automatically enables AES256 encryption on non-compliant buckets.
+
+Resources:
+  S3EncryptionConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: s3-bucket-server-side-encryption-enabled
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED
+
+  S3EncryptionRemediation:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      ConfigRuleName: !Ref S3EncryptionConfigRule
+      TargetType: SSM_DOCUMENT
+      TargetId: AWS-EnableS3BucketEncryption
+      TargetVersion: '1'
+      Parameters:
+        AutomationAssumeRole:
+          StaticValue:
+            Values:
+              - !GetAtt RemediationRole.Arn
+        BucketName:
+          ResourceValue:
+            Value: RESOURCE_ID
+        SSEAlgorithm:
+          StaticValue:
+            Values:
+              - AES256
+      Automatic: true
+      MaximumAutomaticAttempts: 3
+      RetryAttemptSeconds: 60
+
+  RemediationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+      Policies:
+        - PolicyName: S3EncryptionRemediationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutEncryptionConfiguration
+                Resource: '*'

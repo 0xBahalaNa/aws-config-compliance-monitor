@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This template creates an AWS Config rule that checks for security groups attached to ENIs.
+  It also includes a remediation action that automatically removes unrestricted SSH access.
+
+Resources:
+  SecurityGroupConfigRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: ec2-security-group-attached-to-eni-periodic
+      Source:
+        Owner: AWS
+        SourceIdentifier: EC2_SECURITY_GROUP_ATTACHED_TO_ENI_PERIODIC
+
+  SecurityGroupRemediation:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      ConfigRuleName: !Ref SecurityGroupConfigRule
+      TargetType: SSM_DOCUMENT
+      TargetId: AWSConfigRemediation-RemoveUnrestrictedSourceIngressRules
+      TargetVersion: '1'
+      Parameters:
+        AutomationAssumeRole:
+          StaticValue:
+            Values:
+              - !GetAtt RemediationRole.Arn
+        SecurityGroupId:
+          ResourceValue:
+            Value: RESOURCE_ID
+      Automatic: true
+      MaximumAutomaticAttempts: 3
+      RetryAttemptSeconds: 60
+
+  RemediationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+      Policies:
+        - PolicyName: SecurityGroupRemediationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:RevokeSecurityGroupIngress
+                Resource: '*'

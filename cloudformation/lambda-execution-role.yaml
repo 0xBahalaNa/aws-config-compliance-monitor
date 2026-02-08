@@ -1,0 +1,32 @@
+# This is an example of an IAM Role for a Lambda function.
+# It grants basic execution permissions and allows the function to publish to SNS,
+# put objects in S3, and put evaluations in AWS Config.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: IAM Role for GRC automation Lambda functions.
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ComplianceAutomationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                  - sns:Publish
+                  - config:PutEvaluations
+                Resource: '*'
