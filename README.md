@@ -1,3 +1,11 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?logo=amazon-web-services&logoColor=white)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)
+![IaC: CloudFormation](https://img.shields.io/badge/IaC-CloudFormation-E7157B.svg?logo=amazon-web-services&logoColor=white)
+![NIST 800-53](https://img.shields.io/badge/NIST_800--53-Rev._5-006400)
+![FedRAMP High](https://img.shields.io/badge/FedRAMP-High-0033A0)
+![CJIS](https://img.shields.io/badge/CJIS-v6.0-8B0000)
+
 # AWS Config Compliance Monitor
 
 Continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. Built for CJIS Security Policy and FedRAMP High requirements.
