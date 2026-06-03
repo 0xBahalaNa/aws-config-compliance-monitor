@@ -10,6 +10,13 @@
 
 Continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. Built for CJIS Security Policy and FedRAMP High requirements.
 
+> **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook) — Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.0 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
+
+## Status
+
+- **v0.1.0 — Foundation Baseline** (April 2026, Month 1). Core Lambda + EventBridge + 3 Config Rules + 3 remediations implemented and verified end-to-end against the IAM password policy test target.
+- **FedRAMP 20x KSI extension — Month 8 planned** (August 2026). Add Key Security Indicator (KSI) metric extraction from Config compliance evaluations; emit OSCAL Assessment Results JSON alongside the existing CloudWatch logs / SNS evidence stream so this system feeds [`oscal-evidence-pipeline`](https://github.com/0xBahalaNa/oscal-evidence-pipeline) directly.
+
 ## Architecture Overview
 
 This system implements continuous compliance monitoring using AWS Config managed rules, with event-driven alerting and automated remediation. AWS Config evaluates resources against three rules (S3 encryption, security group ingress, IAM password policy). When a resource transitions to NON_COMPLIANT, EventBridge routes the compliance change event to a Lambda function that classifies severity, logs structured audit evidence to CloudWatch, and sends SNS email alerts for HIGH-severity findings. Config remediation actions invoke SSM Automation documents to restore non-compliant resources to their expected state, and Config re-evaluates to confirm compliance.
@@ -90,6 +97,41 @@ CJIS v6.0 (released December 2024) restructured the policy from 13 to 20 policy 
 | Assessment, Authorization & Monitoring | Continuous monitoring | Event-driven architecture evaluates compliance continuously and remediates automatically, supporting CJIS's continuous monitoring mandate |
 
 The password policy remediation (14-character minimum, complexity requirements, 90-day rotation) satisfies CJIS v6.0 Basic Password Standards. CJIS v6.0 also defines Advanced Standards (20-character minimum, banned password list) as a higher tier, which represents a path for future enhancement.
+
+## FedRAMP 20x Alignment
+
+FedRAMP 20x restructures FedRAMP around continuous, machine-readable evidence with Key Security Indicators (KSIs). This system is FedRAMP-20x-ready by architecture:
+
+- **Compliance-as-code:** Every Config rule + SSM remediation is CloudFormation. The compliance contract IS the code.
+- **Machine-readable evidence:** Lambda writes structured JSON audit records to CloudWatch Logs on every compliance state change. The remediation outcome (SSM execution result) is also queryable via API.
+- **Continuous monitoring:** Config evaluates on every resource change; EventBridge surfaces NON_COMPLIANT events in near real-time; SSM remediates without operator intervention.
+- **API-driven evidence:** `aws configservice describe-compliance-by-resource`, `aws ssm describe-automation-executions`, `aws logs filter-log-events` — every artifact is API-queryable. No screenshots required.
+- **30-day vs 90-day review window:** The per-event evidence stream fits the FedRAMP 20x 30-day machine-readable review SLA, not the 90-day manual review cadence.
+
+The Month 8 KSI extension (see *Status*) adds OSCAL Assessment Results JSON emission so this system feeds [`oscal-evidence-pipeline`](https://github.com/0xBahalaNa/oscal-evidence-pipeline) as a Component Definition source for FedRAMP 20x submission packages.
+
+## Sample Evidence Output
+
+A representative HIGH-severity compliance violation evidence record written to CloudWatch Logs:
+
+```json
+{
+  "severity": "HIGH",
+  "rule_name": "iam-password-policy",
+  "resource_type": "AWS::IAM::User",
+  "compliance_type": "NON_COMPLIANT",
+  "account_id": "123456789012",
+  "region": "us-east-1",
+  "evaluation_timestamp": "2026-06-03T14:22:17Z",
+  "config_rule_arn": "arn:aws:config:us-east-1:123456789012:config-rule/config-rule-abc123",
+  "remediation_triggered": true,
+  "remediation_automation_id": "AWS-EnforceAccountPasswordPolicy",
+  "alert_destination": "arn:aws:sns:us-east-1:123456789012:compliance-alerts",
+  "controls_addressed": ["IA-5", "CM-6", "AU-6"]
+}
+```
+
+The same evidence is published to SNS as an email alert (see *Screenshots*) and queryable via `aws logs filter-log-events --log-group /aws/lambda/ComplianceViolationLogger`. In the Month 8 extension this record becomes the input to an OSCAL observation, with `controls_addressed` rendered as `props.ns=http://csrc.nist.gov/ns/oscal` entries and `evaluation_timestamp` as the OSCAL `collected` field.
 
 ## Bugs Found and Fixed
 
@@ -201,7 +243,3 @@ aws lambda delete-function --function-name ComplianceViolationLogger
 
 aws cloudformation delete-stack --stack-name compliance-lambda-role
 ```
-
-## Based On
-
-This project is based on Chapter 6 ("Event-Driven Architecture for GRC Engineers") of [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook) by AJ Yawn.
