@@ -21,11 +21,16 @@ Continuous compliance monitoring that detects configuration drift, logs audit-re
 
 This system implements continuous compliance monitoring using AWS Config managed rules, with event-driven alerting and automated remediation. AWS Config evaluates resources against three rules (S3 encryption, security group ingress, IAM password policy). When a resource transitions to NON_COMPLIANT, EventBridge routes the compliance change event to a Lambda function that classifies severity, logs structured audit evidence to CloudWatch, and sends SNS email alerts for HIGH-severity findings. Config remediation actions invoke SSM Automation documents to restore non-compliant resources to their expected state, and Config re-evaluates to confirm compliance.
 
+```mermaid
+graph TD
+    Config[AWS Config] --> EB[EventBridge]
+    EB --> Lambda[Lambda]
+    Lambda --> CW["CloudWatch Logs<br/>audit evidence"]
+    Lambda --> SNS["SNS<br/>email alerts"]
+    Config --> SSM["SSM Automation<br/>auto-remediation"]
 ```
-AWS Config --> EventBridge --> Lambda --> CloudWatch Logs (audit evidence)
-                                     --> SNS (email alerts)
-           --> SSM Automation (auto-remediation)
-```
+
+Editable Mermaid source (kept in sync with the fence above): [`docs/architecture.mmd`](docs/architecture.mmd).
 
 ## Screenshots
 

@@ -1,0 +1,9 @@
+%% Editable Mermaid source for the README "Architecture Overview" section.
+%% Keep this file in sync with the inline ```mermaid fence in README.md.
+%% Diff-able source of truth for the architecture graph (no separate PNG export).
+graph TD
+    Config[AWS Config] --> EB[EventBridge]
+    EB --> Lambda[Lambda]
+    Lambda --> CW["CloudWatch Logs<br/>audit evidence"]
+    Lambda --> SNS["SNS<br/>email alerts"]
+    Config --> SSM["SSM Automation<br/>auto-remediation"]
