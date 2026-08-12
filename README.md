@@ -10,12 +10,12 @@
 
 Continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. Built for CJIS Security Policy and FedRAMP High requirements.
 
-> **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook) — Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.0 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
+> **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook), Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.0 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
 
 ## Status
 
-- **v0.1.0 — Foundation Baseline** (April 2026, Month 1). Core Lambda + EventBridge + 3 Config Rules + 3 remediations implemented and verified end-to-end against the IAM password policy test target.
-- **FedRAMP 20x KSI extension — Month 8 planned** (August 2026). Add Key Security Indicator (KSI) metric extraction from Config compliance evaluations; emit OSCAL Assessment Results JSON alongside the existing CloudWatch logs / SNS evidence stream so this system feeds [`oscal-evidence-pipeline`](https://github.com/0xBahalaNa/oscal-evidence-pipeline) directly.
+- **v0.1.0 Foundation Baseline** (April 2026, Month 1). Core Lambda + EventBridge + 3 Config Rules + 3 remediations implemented and verified end-to-end against the IAM password policy test target.
+- **FedRAMP 20x KSI extension, Month 8 planned** (August 2026). Add Key Security Indicator (KSI) metric extraction from Config compliance evaluations; emit OSCAL Assessment Results JSON alongside the existing CloudWatch logs / SNS evidence stream so this system feeds [`oscal-evidence-pipeline`](https://github.com/0xBahalaNa/oscal-evidence-pipeline) directly.
 
 ## Architecture Overview
 
@@ -110,7 +110,7 @@ FedRAMP 20x restructures FedRAMP around continuous, machine-readable evidence wi
 - **Compliance-as-code:** Every Config rule + SSM remediation is CloudFormation. The compliance contract IS the code.
 - **Machine-readable evidence:** Lambda writes structured JSON audit records to CloudWatch Logs on every compliance state change. The remediation outcome (SSM execution result) is also queryable via API.
 - **Continuous monitoring:** Config evaluates on every resource change; EventBridge surfaces NON_COMPLIANT events in near real-time; SSM remediates without operator intervention.
-- **API-driven evidence:** `aws configservice describe-compliance-by-resource`, `aws ssm describe-automation-executions`, `aws logs filter-log-events` — every artifact is API-queryable. No screenshots required.
+- **API-driven evidence:** `aws configservice describe-compliance-by-resource`, `aws ssm describe-automation-executions`, `aws logs filter-log-events`. Every artifact is API-queryable. No screenshots required.
 - **30-day vs 90-day review window:** The per-event evidence stream fits the FedRAMP 20x 30-day machine-readable review SLA, not the 90-day manual review cadence.
 
 The Month 8 KSI extension (see *Status*) adds OSCAL Assessment Results JSON emission so this system feeds [`oscal-evidence-pipeline`](https://github.com/0xBahalaNa/oscal-evidence-pipeline) as a Component Definition source for FedRAMP 20x submission packages.
