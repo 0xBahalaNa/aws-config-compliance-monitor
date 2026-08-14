@@ -4,13 +4,13 @@
 ![IaC: CloudFormation](https://img.shields.io/badge/IaC-CloudFormation-E7157B.svg?logo=amazon-web-services&logoColor=white)
 ![NIST 800-53](https://img.shields.io/badge/NIST_800--53-Rev._5-006400)
 ![FedRAMP High](https://img.shields.io/badge/FedRAMP-High-0033A0)
-![CJIS](https://img.shields.io/badge/CJIS-v6.0-8B0000)
+![CJIS](https://img.shields.io/badge/CJIS-Security%20Policy%20v6.1-cc0000?style=flat)
 
 # AWS Config Compliance Monitor
 
 Continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. Built for CJIS Security Policy and FedRAMP High requirements.
 
-> **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook), Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.0 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
+> **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook), Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.1 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
 
 ## Status
 
@@ -89,19 +89,19 @@ Editable Mermaid source (kept in sync with the fence above): [`docs/architecture
 
 FedRAMP High baseline inherits all NIST 800-53 Rev. 5 controls listed above. This implementation directly supports FedRAMP High authorization by enforcing continuous configuration monitoring, automated remediation, and structured audit logging. The event-driven architecture aligns with FedRAMP's continuous monitoring requirements: compliance state is evaluated in near real-time, violations are automatically surfaced and remediated, and audit evidence is retained in CloudWatch Logs.
 
-### CJIS Security Policy v6.0
+### CJIS Security Policy v6.1
 
-CJIS v6.0 (released December 2024) restructured the policy from 13 to 20 policy areas and aligned with NIST SP 800-53 Rev. 5. The table below maps this project's controls to the v6.0 policy area structure.
+CJIS Security Policy v6.1 (released June 25, 2026) is the current policy, aligned with NIST 800-53 Rev 5. v6.x has been the default audit baseline since April 1, 2026 (v5.9.5 sunset March 31, 2026); modernized Priority 2-4 controls are fully enforceable Oct 1, 2027 (timing varies by state CSA). The modernized policy organizes requirements by NIST 800-53 Rev 5 control family; the table below maps this project's controls to those families.
 
-| Policy Area | Requirement | How This Project Addresses It |
+| Control Family | Requirement | How This Project Addresses It |
 |---|---|---|
-| Policy Area 4: Auditing and Accountability | Audit event logging and review | Lambda writes structured JSON audit records to CloudWatch Logs for every compliance violation, providing tamper-evident audit evidence |
-| Policy Area 5: Access Control | Least privilege and access enforcement | Lambda and SSM execution roles follow least-privilege principles; IAM roles are scoped to only the actions required for remediation |
-| Policy Area 6: Identification and Authentication | Password standards enforcement | IAM password policy remediation enforces 14-character minimum, uppercase/lowercase/number/symbol complexity, and 90-day rotation, satisfying CJIS v6.0 Basic Password Standards |
-| Policy Area 10: Systems and Communications Protection | Encryption at rest and network segmentation | S3 encryption rule enforces server-side encryption; security group rule detects and remediates unrestricted network ingress |
-| Assessment, Authorization & Monitoring | Continuous monitoring | Event-driven architecture evaluates compliance continuously and remediates automatically, supporting CJIS's continuous monitoring mandate |
+| Audit and Accountability (AU) | Audit event logging and review | Lambda writes structured JSON audit records to CloudWatch Logs for every compliance violation, providing tamper-evident audit evidence |
+| Access Control (AC) | Least privilege and access enforcement | Lambda and SSM execution roles follow least-privilege principles; IAM roles are scoped to only the actions required for remediation |
+| Identification and Authentication (IA) | Password standards enforcement | IAM password policy remediation enforces 14-character minimum, uppercase/lowercase/number/symbol complexity, and 90-day rotation, satisfying CJIS v6.1 Basic Password Standards |
+| System and Communications Protection (SC) | Encryption at rest and network segmentation | S3 encryption rule enforces server-side encryption; security group rule detects and remediates unrestricted network ingress |
+| Assessment, Authorization, and Monitoring (CA) | Continuous monitoring | Event-driven architecture evaluates compliance continuously and remediates automatically, supporting CJIS's continuous monitoring mandate |
 
-The password policy remediation (14-character minimum, complexity requirements, 90-day rotation) satisfies CJIS v6.0 Basic Password Standards. CJIS v6.0 also defines Advanced Standards (20-character minimum, banned password list) as a higher tier, which represents a path for future enhancement.
+The password policy remediation (14-character minimum, complexity requirements, 90-day rotation) satisfies CJIS v6.1 Basic Password Standards. CJIS v6.1 also defines Advanced Standards (20-character minimum, banned password list) as a higher tier, which represents a path for future enhancement.
 
 ## FedRAMP 20x Alignment
 
