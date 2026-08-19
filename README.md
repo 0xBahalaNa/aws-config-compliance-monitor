@@ -8,7 +8,7 @@
 
 # AWS Config Compliance Monitor
 
-Continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. Built for CJIS Security Policy and FedRAMP High requirements.
+I built continuous compliance monitoring that detects configuration drift, logs audit-ready evidence, and auto-remediates violations. The control set targets CJIS Security Policy and FedRAMP High.
 
 > **From [GRC Engineering in AWS (V2)](https://github.com/ajy0127/thegrcengineeringbook), Chapter 6 ("Event-Driven Architecture for GRC Engineers") by AJ Yawn.** This implementation extends the book lab with full CJIS v6.1 control mapping and a FedRAMP 20x continuous-monitoring posture for public-safety SaaS environments.
 
