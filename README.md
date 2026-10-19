@@ -248,3 +248,5 @@ aws lambda delete-function --function-name ComplianceViolationLogger
 
 aws cloudformation delete-stack --stack-name compliance-lambda-role
 ```
+
+CI runs `cfn-lint` on `cloudformation/*.yaml` and `python -m py_compile` on `lambda/compliance_violation_logger.py`.
