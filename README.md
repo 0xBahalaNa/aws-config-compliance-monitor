@@ -81,7 +81,7 @@ Editable Mermaid source (kept in sync with the fence above): [`docs/architecture
 | AU-6 | Audit Record Review, Analysis, and Reporting | Lambda writes structured JSON audit logs to CloudWatch; SNS alerts surface HIGH-severity findings for immediate review |
 | CM-2 | Baseline Configuration | CloudFormation templates define the expected resource configuration baseline; Config evaluates against it |
 | CM-6 | Configuration Settings | Config managed rules enforce organization-defined configuration settings (encryption, password policy, network access) |
-| IA-5 | Authenticator Management | IAM password policy rule enforces 14-character minimum, complexity requirements, and 90-day rotation |
+| IA-5 | Authenticator Management | IAM password policy rule enforces a 14-character minimum, complexity requirements, and a 90-day maximum password age. CJIS v6.1 IA-5(f) requires changing or refreshing memorized secret authenticators annually or when there is evidence of authenticator compromise. The 90-day age is stricter than the annual cadence in IA-5(f) |
 | SC-28 | Protection of Information at Rest | S3 encryption rule ensures server-side encryption is enabled on all buckets |
 | SC-7 | Boundary Protection | Security group rule detects unrestricted ingress, and SSM remediation removes unauthorized access |
 
@@ -97,11 +97,11 @@ CJIS Security Policy v6.1 (released June 25, 2026) is the current policy, aligne
 |---|---|---|
 | Audit and Accountability (AU) | Audit event logging and review | Lambda writes structured JSON audit records to CloudWatch Logs for every compliance violation, providing tamper-evident audit evidence |
 | Access Control (AC) | Least privilege and access enforcement | Lambda and SSM execution roles follow least-privilege principles; IAM roles are scoped to only the actions required for remediation |
-| Identification and Authentication (IA) | Password standards enforcement | IAM password policy remediation enforces 14-character minimum, uppercase/lowercase/number/symbol complexity, and 90-day rotation, satisfying CJIS v6.1 Basic Password Standards |
+| Identification and Authentication (IA) | Password standards enforcement | IAM password policy remediation enforces a 14-character minimum, uppercase, lowercase, number, and symbol complexity, and a 90-day maximum password age. CJIS v6.1 IA-5(f) requires changing or refreshing memorized secret authenticators annually or when there is evidence of authenticator compromise. The 90-day age is stricter than the annual cadence in IA-5(f) |
 | System and Communications Protection (SC) | Encryption at rest and network segmentation | S3 encryption rule enforces server-side encryption; security group rule detects and remediates unrestricted network ingress |
 | Assessment, Authorization, and Monitoring (CA) | Continuous monitoring | Event-driven architecture evaluates compliance continuously and remediates automatically, supporting CJIS's continuous monitoring mandate |
 
-The password policy remediation (14-character minimum, complexity requirements, 90-day rotation) satisfies CJIS v6.1 Basic Password Standards. CJIS v6.1 also defines Advanced Standards (20-character minimum, banned password list) as a higher tier, which represents a path for future enhancement.
+The password policy remediation enforces a 14-character minimum, complexity requirements, and a 90-day maximum password age. CJIS v6.1 IA-5(f) requires changing or refreshing memorized secret authenticators annually or when there is evidence of authenticator compromise. The 90-day age is stricter than the annual cadence in IA-5(f).
 
 ## FedRAMP 20x Alignment
 
